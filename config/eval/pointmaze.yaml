@@ -1,0 +1,66 @@
+defaults:
+  - launcher: local
+  - solver: cem
+  - _self_
+
+# Dataset-driven goal reaching, exactly as for the other envs: the goal is the
+# state the DEMO reached `goal_offset_steps` later, not the benchmark's own task
+# target. Success is the env's native test, here
+# ||get_xy() - cur_goal_xy|| <= _goal_tol -- a single position tolerance, unlike
+# PushT's joint agent-AND-block ball, so the number measures one thing.
+world:
+  env_name: swm/OGBMaze-v0
+  num_envs: ${eval.num_eval}
+  max_episode_steps: ??? # set by eval.py to 2 * eval_budget
+  # Must match what dataset_collection.py rendered with, or set_state describes
+  # a different model: point has nq=nv=2, ant has nq=15/nv=14.
+  loco_env_type: point
+  maze_env_type: maze
+  maze_type: medium
+  ob_type: states
+  width: 224
+  height: 224
+
+dataset:
+  stats: ${eval.dataset_name}
+  keys_to_cache:
+    - action
+    - observation
+
+seed: 42
+policy: random # ckpt name or random
+
+plan_config:
+  horizon: 5
+  receding_horizon: 5
+  action_block: 5 # frameskip
+
+eval:
+  num_eval: 50
+  goal_offset_steps: 25
+  eval_budget: 50
+  img_size: 224
+  save_video: true
+  dataset_name: ogbench/pointmaze_medium_navigate
+  # NOTE _apply_callables SKIPS a spec whose method the env does not have --
+  # silently, with no warning. A typo here does not raise, it just yields a run
+  # where the goal is never set and every episode fails. Both methods below live
+  # on ogbench's MazeEnv, which is what `.unwrapped` returns for swm/OGBMaze-v0.
+  callables:
+    # -- set the initial state
+    - method: set_state
+      args:
+        qpos:
+          value: qpos
+        qvel:
+          value: qvel
+    # -- set the goal. `value:` names a dataset KEY and cannot slice, which is
+    # why dataset_collection.py writes agent_xy (= qpos[:, :2]) as its own
+    # column; the goal-side copy is prefixed goal_ by _extract_init_goal.
+    - method: set_goal
+      args:
+        goal_xy:
+          value: goal_agent_xy
+
+output:
+  filename: pointmaze_results.txt

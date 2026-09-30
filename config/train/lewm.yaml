@@ -1,0 +1,59 @@
+defaults:
+  - _self_
+  - launcher: local
+  - data: pusht
+  - model: lewm
+
+output_model_name: ctwm-pusht
+subdir: ${output_model_name}
+
+num_workers: 6
+train_split: 0.9
+seed: 3070
+img_size: 224
+episode_frac: 1.0
+
+encoder_dim: 192
+embed_dim: 64
+history_size: 3
+
+trainer:
+  max_epochs: 10
+  devices: auto
+  accelerator: gpu
+  precision: bf16
+  gradient_clip_val: 1.0
+
+loader:
+  batch_size: 32
+  num_workers: ${num_workers}
+  persistent_workers: True
+  prefetch_factor: 3
+  pin_memory: True
+
+optimizer:
+  type: AdamW
+  lr: 5e-5
+  weight_decay: 0 
+  predictor_lr_mult: 1.0   
+
+num_preds: 1
+
+loss:
+  type: vicreg_logdet        # "sigreg" | "vicreg" | "vicreg_logdet"
+  beta: 0.1
+  sigreg:
+    weight: 0.09
+    kwargs:
+      knots: 17
+      num_proj: 1024
+
+  vicreg_logdet:
+    sim_w: 1.0
+    ent_w: 1
+    eps: 1e-6
+
+  vicreg:              
+    sim_w: 25.0
+    std_w: 25.0
+    cov_w: 1.0
