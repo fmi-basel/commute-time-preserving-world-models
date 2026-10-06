@@ -32,7 +32,7 @@ Download datasets from:
 
 - **PushT, Two-Room, Cube and Reacher** &mdash; the datasets released with LeWM,
   from [HuggingFace](https://huggingface.co/collections/quentinll/lewm)
-- **PointMaze** &mdash; the dataset can be similarly loaded from [HuggingFace]()
+- **PointMaze** &mdash; the dataset can be similarly loaded from [HuggingFace](https://huggingface.co/datasets/mikehau/pointmaze/tree/main)
 - **Scene** &mdash; dataset can be found
   [here](https://huggingface.co/datasets/galilai-group/ogb_scene_single/tree/main)
   in lance format.
