@@ -71,18 +71,24 @@ To run:
 python train.py data=pusht
 ```
 
+## Pretrained checkpoints
+
+One CTWM checkpoint per environment is available in the
+[HuggingFace collection](https://huggingface.co/collections/mikehau/ctwm), as `<user>/ctwm-<env>-01` with
+`<env>` one of `pusht`, `tworoom`, `cube`, `reacher`, `pointmaze`, `scene`.
+
 ## Planning and evaluation
 
 Evaluation configs live under `config/eval/`. `policy` is a checkpoint path relative to `$STABLEWM_HOME/checkpoints`:
 
 ```bash
-python eval.py --config-name=pusht policy=<run_name>/weights_epoch_10.pt
+python eval.py --config-name=pusht policy=<run_name>/weights.pt
 python eval.py --config-name=pusht policy=random
 ```
 
 For the hard setting (goal defined 100 steps ahead):
 
 ```bash
-python eval.py --config-name=pusht policy=<run_name>/weights_epoch_10.pt \
+python eval.py --config-name=pusht policy=<user>/ctwm-pusht-01 \
     eval.goal_offset_steps=100 eval.eval_budget=125
 ```
